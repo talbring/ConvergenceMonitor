@@ -13,8 +13,10 @@ class DataTab : public QWidget
   Q_OBJECT
 
 public:
-  explicit DataTab( DataHandler *data_, QCustomPlot *plot_, QWidget *parent = 0);
+  explicit DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWidget *parent = 0);
   ~DataTab();
+  void updateData(DataHandler* new_data);
+  QString getFileName();
 
 protected slots:
   void showGraph(int state);
@@ -25,6 +27,8 @@ private:
   Ui::DataTab *ui;
   DataHandler *data;
   QCustomPlot *plot;
+  QString fileName;
+
 
 };
 

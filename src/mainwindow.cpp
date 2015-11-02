@@ -13,16 +13,22 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->setupUi(this);
   ui->customplot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables | QCP::iSelectLegend | QCP::iSelectAxes);
 
-  connect(ui->actionLoad_History,SIGNAL(triggered(bool)), this, SLOT(ReadHistory()));
+  connect(ui->actionLoad_History,SIGNAL(triggered(bool)), this, SLOT(addDataTab()));
   connect(ui->customplot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(ShowContext(QCPAbstractPlottable*, QMouseEvent*)));
   connect(ui->actionFit_to_Data, SIGNAL(triggered(bool)), this, SLOT(FitToData(bool)));
   connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+  connect(ui->buttonRefresh, SIGNAL(clicked(bool)), this, SLOT(refreshData()));
+  connect(ui->checkRefresh, SIGNAL(clicked(bool)), this, SLOT(autoRefresh(bool)));
+  connect(&timer, SIGNAL(timeout()), this, SLOT(refreshData()));
+  connect(ui->spinRefresh, SIGNAL(valueChanged(int)),  &timer, SLOT(start(int)));
   ui->customplot->legend->setVisible(true);
 
 
   connect(ui->customplot->yAxis2, SIGNAL(selectionChanged(QCPAxis::SelectableParts)), this, SLOT(SetRangeAxis(QCPAxis::SelectableParts)));
   connect(ui->customplot->yAxis, SIGNAL(selectionChanged(QCPAxis::SelectableParts)), this, SLOT(SetRangeAxis(QCPAxis::SelectableParts)));
   ui->tabWidget->addTab(new QLabel("No data, load a history file"), QString("Data"));
+
+  ui->customplot->xAxis->setLabel("Iteration");
 }
 
 MainWindow::~MainWindow()
@@ -78,22 +84,38 @@ void MainWindow::ShowContext(QCPAbstractPlottable* plot, QMouseEvent* event) // 
       }
 }
 
-void MainWindow::ReadHistory(){
 
-  bool csv = false;
+void MainWindow::addDataTab(){
+
+  DataHandler *data = new DataHandler();
+
   QString fileName = QFileDialog::getOpenFileName(this, tr("Open History File"),"", tr("SU2 History File (*.dat *.plt)"));
-
-  DataHandler* datahandler = new DataHandler;
-  QVector<QStringList> DataLines;
-  QStringList HeaderLine;
-
   QString tabname = fileName.split("/").last();
 
+  if (!readDataFromFile(data,fileName)){
+    QMessageBox::information(0, "Error", "There was an error while reading the file.");
+  }
   if (fileName != ""){
-    QStringList ext = fileName.split(".");
 
-    if (ext[1] == "csv") csv = true;
+    if(DataIndex == 0){
+      ui->tabWidget->removeTab(0);
+    }
+    DataIndex++;
 
+    DataTab* tab = new DataTab(data,ui->customplot, fileName,ui->tabWidget);
+
+    datatabs.push_back(tab);
+
+    tab->setProperty("FullPath", fileName);
+
+    ui->tabWidget->addTab(tab, tabname);
+  }
+}
+
+
+bool MainWindow::readDataFromFile(DataHandler *datahandler, QString fileName){
+
+  if (fileName != ""){
     QFile file(fileName);
 
     if(!file.open(QIODevice::ReadOnly)) {
@@ -102,19 +124,33 @@ void MainWindow::ReadHistory(){
 
     QTextStream in(&file);
 
-    in.readLine();
+    /* --- Skip first line ---*/
+
+    QString firstLine = in.readLine();
+    firstLine = firstLine.split("=")[1];
+
+
+    /* --- Read datafile header ---*/
 
     QString header = in.readLine();
-
-    HeaderLine = header.split(",");
+    QStringList HeaderLine = header.split(",");
 
     for (int i = 0; i < HeaderLine.size(); i++){
       HeaderLine[i] = HeaderLine[i].remove("\"");
-      std::cout << HeaderLine[i].toStdString() << std::endl;
     }
+
+
+    /* --- Remove the VARIABLES= at beginning of line ---*/
+
     HeaderLine[0] = HeaderLine[0].split("=")[1];
 
+    /* --- Skip third line ---*/
+
     in.readLine();
+
+    /* --- Read the data lines until end of file --- */
+
+    QVector<QStringList> DataLines;
 
     while(!in.atEnd()) {
         QString line = in.readLine();
@@ -140,21 +176,27 @@ void MainWindow::ReadHistory(){
         datahandler->addData(item);
     }
 
-    for (int i = 1; i < HeaderLine.size(); i++){
-      datahandler->getData(i).graph = ui->customplot->addGraph();
+    return true;
+  }
+  return true;
+}
+
+void MainWindow::refreshData(){
+  if (DataIndex != 0){
+    for (uint iTab = 0; iTab < datatabs.size(); iTab++){
+      DataHandler *data = new DataHandler();
+      readDataFromFile(data, datatabs[iTab]->getFileName());
+      datatabs[iTab]->updateData(data);
+      delete data;
     }
+  }
+}
 
-    if(DataIndex == 0){
-        ui->tabWidget->removeTab(0);
-      }
-    DataIndex++;
-
-    DataTab* tab = new DataTab(datahandler,ui->customplot,ui->tabWidget);
-
-    tab->setProperty("FullPath", fileName);
-    qDebug() << tabname;
-
-    ui->tabWidget->addTab(tab, tabname);
+void MainWindow::autoRefresh(bool activate){
+  if (activate){
+     timer.start(ui->spinRefresh->value());
+  }else{
+    timer.stop();
   }
 }
 

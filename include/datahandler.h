@@ -26,7 +26,9 @@ public:
 
   unsigned short GetnData();
 
-  void changeLabel(const unsigned short index, QString label);
+  void updateValues(DataHandler *datahandler);
+  void updateValues(const unsigned short index, QVector<double> data);
+  void updateLabel(const unsigned short index, QString label);
 
 private:
   QVector<DataItem> DataItems;

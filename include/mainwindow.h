@@ -3,10 +3,11 @@
 
 #include <QMainWindow>
 #include <QTableWidgetItem>
+#include <QtConcurrent/QtConcurrent>
 
 #include "../include/qcustomplot.h"
 #include "../include/datahandler.h"
-
+#include "../include/datatab.h"
 namespace Ui {
   class MainWindow;
 }
@@ -15,23 +16,26 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
-  DataHandler *datahandler;
-
-
 public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
 
 protected slots:
-  void ReadHistory();
+  void addDataTab();
   void ShowContext(QCPAbstractPlottable* plot, QMouseEvent* event);
   void FitToData(bool triggered);
   void closeTab(int index);
   void SetRangeAxis(QCPAxis::SelectableParts axis);
+  void refreshData();
+  void autoRefresh(bool activate);
 
 private:
+  bool readDataFromFile(DataHandler* datahandler, QString fileName);
   Ui::MainWindow *ui;
   uint DataIndex, NameIndex;
+  QTimer timer;
+  QVector<DataTab*> datatabs;
+
 };
 
 #endif // MAINWINDOW_H

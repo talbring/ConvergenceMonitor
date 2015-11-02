@@ -4,13 +4,13 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = ConvergenceMonitor
 TEMPLATE = app
-
+CONFIG += debug_and_release
 INCLUDEPATH += include
 
 SOURCES += src/main.cpp\

@@ -1,11 +1,12 @@
 #include "../include/datatab.h"
 #include "../ui/ui_datatab.h"
 #include "../include/datahandler.h"
-DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QWidget *parent) :
+DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::DataTab),
   data(data_),
-  plot(plot_)
+  plot(plot_),
+  fileName(fileName_)
 {
   ui->setupUi(this);
 
@@ -25,6 +26,7 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QWidget *parent) :
   DataHandler::DataItem& iterationNumber = data->getData(0);
 
   for (int i = 1; i < data->GetnData(); i++){
+      data->getData(i).graph = plot->addGraph();
 
       DataHandler::DataItem& item = data->getData(i);
 
@@ -44,7 +46,6 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QWidget *parent) :
       connect(comboItem, SIGNAL(currentTextChanged(QString)), this, SLOT(changeAxes(QString)));
       ui->tableWidget->setCellWidget(i-1,2, comboItem);
 
-      item.graph->addData(iterationNumber.data, item.data);
       item.graph->setName(item.label);
       item.graph->setVisible(false);
       QPen qpen(QColor(colors[(i) % 9]));
@@ -52,6 +53,28 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QWidget *parent) :
       item.graph->removeFromLegend();
 
    }
+  updateData(data);
+}
+
+QString DataTab::getFileName(){
+  return fileName;
+}
+
+void DataTab::updateData(DataHandler *new_data){
+
+  data->updateValues(new_data);
+
+  DataHandler::DataItem& iterationNumber = data->getData(0);
+
+  for (int i = 1; i < data->GetnData(); i++){
+    DataHandler::DataItem& item = data->getData(i);
+
+    item.graph->clearData();
+
+    item.graph->addData(iterationNumber.data, item.data);
+  }
+  plot->rescaleAxes(true);
+  plot->replot();
 }
 
 void DataTab::changeLabel(int row, int column){
@@ -116,6 +139,7 @@ DataTab::~DataTab()
      plot->removeGraph(item.graph);
   }
 
+  plot->replot();
   delete data;
   delete ui;
 }
