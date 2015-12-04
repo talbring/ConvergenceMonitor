@@ -1,6 +1,7 @@
 #include "../include/datatab.h"
 #include "../ui/ui_datatab.h"
 #include "../include/datahandler.h"
+#include <iostream>
 DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWidget *parent) :
   QWidget(parent),
   ui(new Ui::DataTab),
@@ -14,16 +15,12 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
   ui->tableWidget->setRowCount(data->GetnData()-1);
   ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Variable" << "Show" << "Axis");
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
   connect(ui->tableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(changeLabel(int,int)));
 
   QStringList colors;
-
   colors <<"Red"<< "Green"<< "Blue" << "darkRed"
         << "darkGreen" << "darkBlue" << "darkMagenta"
         << "darkCyan" << "darkYellow";
-
-  DataHandler::DataItem& iterationNumber = data->getData(0);
 
   for (int i = 1; i < data->GetnData(); i++){
       data->getData(i).graph = plot->addGraph();
@@ -48,7 +45,8 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
 
       item.graph->setName(item.label);
       item.graph->setVisible(false);
-      QPen qpen(QColor(colors[(i) % 9]));
+      QPen qpen;
+      qpen.setColor(colors[(i)%9]);
       item.graph->setPen(qpen);
       item.graph->removeFromLegend();
 
