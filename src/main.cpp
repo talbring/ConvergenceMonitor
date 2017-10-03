@@ -7,5 +7,12 @@ int main(int argc, char *argv[])
   MainWindow w;
   w.show();
 
+  for (int numargs = 1; numargs < argc; numargs++){
+    
+    QString filename = argv[numargs];
+     qDebug() << filename;
+    w.addDataTab(filename);
+    
+  }
   return a.exec();
 }

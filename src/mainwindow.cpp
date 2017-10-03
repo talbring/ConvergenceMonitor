@@ -13,7 +13,12 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->setupUi(this);
   ui->customplot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables | QCP::iSelectLegend | QCP::iSelectAxes);
 
-  connect(ui->actionLoad_History,SIGNAL(triggered(bool)), this, SLOT(addDataTab()));
+  QSignalMapper *mapper = new QSignalMapper();
+  connect(ui->actionLoad_History,SIGNAL(triggered()), mapper, SLOT(map()));
+  
+  mapper->setMapping(ui->actionLoad_History, QString(""));
+  
+  connect(mapper,SIGNAL(mapped(QString)), this, SLOT(addDataTab(QString)));
   connect(ui->customplot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(ShowContext(QCPAbstractPlottable*, QMouseEvent*)));
   connect(ui->actionFit_to_Data, SIGNAL(triggered(bool)), this, SLOT(FitToData(bool)));
   connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
@@ -85,13 +90,14 @@ void MainWindow::ShowContext(QCPAbstractPlottable* plot, QMouseEvent* event) // 
 }
 
 
-void MainWindow::addDataTab(){
+void MainWindow::addDataTab(QString fileName){
 
   DataHandler *data = new DataHandler();
-
-  QString fileName = QFileDialog::getOpenFileName(this, tr("Open History File"),"", tr("SU2 History File (*.dat *.plt)"));
-  QString tabname = fileName.split("/").last();
-
+  QString tabname;
+  if (fileName.isEmpty()){
+    fileName = QFileDialog::getOpenFileName(this, tr("Open History File"),"", tr("SU2 History File (*.dat *.plt)"));
+  }
+  tabname = fileName.split("/").last();  
   if (!readDataFromFile(data,fileName)){
     QMessageBox::information(0, "Error", "There was an error while reading the file.");
   }
@@ -215,4 +221,6 @@ void MainWindow::closeTab(int index){
       ui->tabWidget->addTab(new QLabel("No data, load a history file"), QString("Data"));
     }
    }
+  ui->customplot->replot();
+  
 }

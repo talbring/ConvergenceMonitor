@@ -19,9 +19,10 @@ class MainWindow : public QMainWindow
 public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
+public slots:
+  void addDataTab(QString fileName);
 
 protected slots:
-  void addDataTab();
   void ShowContext(QCPAbstractPlottable* plot, QMouseEvent* event);
   void FitToData(bool triggered);
   void closeTab(int index);

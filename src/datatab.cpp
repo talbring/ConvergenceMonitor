@@ -42,6 +42,9 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
       comboItem->setProperty("row", i);
       connect(comboItem, SIGNAL(currentTextChanged(QString)), this, SLOT(changeAxes(QString)));
       ui->tableWidget->setCellWidget(i-1,2, comboItem);
+      
+      
+      
 
       item.graph->setName(item.label);
       item.graph->setVisible(false);
@@ -171,7 +174,7 @@ DataTab::~DataTab()
      plot->removeGraph(item.graph);
   }
 
-  plot->replot();
+//  plot->replot();
   delete data;
   delete ui;
 }
