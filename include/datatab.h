@@ -22,6 +22,7 @@ protected slots:
   void showGraph(int state);
   void changeAxes(QString axes);
   void changeLabel(int row, int column);
+  void changeColor(int row);
 
 private:
   Ui::DataTab *ui;

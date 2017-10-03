@@ -11,9 +11,9 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
 {
   ui->setupUi(this);
 
-  ui->tableWidget->setColumnCount(3);
+  ui->tableWidget->setColumnCount(4);
   ui->tableWidget->setRowCount(data->GetnData()-1);
-  ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Variable" << "Show" << "Axis");
+  ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Variable" << "Show" << "Axis" << "Color");
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   connect(ui->tableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(changeLabel(int,int)));
 
@@ -50,8 +50,42 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
       item.graph->setPen(qpen);
       item.graph->removeFromLegend();
 
+      
+      QPushButton *ColorButton = new QPushButton(ui->tableWidget);
+      QSignalMapper *ButtonSignalMapper = new QSignalMapper();
+      
+      connect(ColorButton, SIGNAL(pressed()), ButtonSignalMapper, SLOT(map()));
+      ButtonSignalMapper->setMapping(ColorButton, i-1);
+      connect(ButtonSignalMapper, SIGNAL(mapped(int)), this, SLOT(changeColor(int)));
+      ui->tableWidget->setCellWidget(i-1, 3, ColorButton);
+      
+      QPalette pal = ColorButton->palette();
+      pal.setColor(QPalette::Button, colors[(i)%9]);
+      ColorButton->setPalette(pal);
+      ColorButton->setFlat(true);
+      ColorButton->setAutoFillBackground(true);
+      
    }
   updateData(data);
+}
+
+
+void DataTab::changeColor(int row){
+  
+  QColor chosenColor = QColorDialog::getColor(); //return the color chosen by user
+
+  QPushButton* ColorButton = (QPushButton*)ui->tableWidget->cellWidget(row, 3);
+  
+  QPalette pal = ColorButton->palette();
+  pal.setColor(QPalette::Button, chosenColor);
+  ColorButton->setPalette(pal);
+  ColorButton->setAutoFillBackground(true);
+  
+  QPen qpen;
+  qpen.setColor(chosenColor);
+  data->getData(row+1).graph->setPen(qpen);
+  
+  plot->replot();
 }
 
 QString DataTab::getFileName(){
