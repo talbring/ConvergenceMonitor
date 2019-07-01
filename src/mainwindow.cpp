@@ -95,12 +95,14 @@ void MainWindow::addDataTab(QString fileName){
   DataHandler *data = new DataHandler();
   QString tabname;
   if (fileName.isEmpty()){
-    fileName = QFileDialog::getOpenFileName(this, tr("Open History File"),"", tr("SU2 History File (*.dat *.plt)"));
+    fileName = QFileDialog::getOpenFileName(this, tr("Open History File"),"", tr("SU2 History File (*.dat *.plt *.csv)"));
   }
   tabname = fileName.split("/").last();  
+
   if (!readDataFromFile(data,fileName)){
     QMessageBox::information(0, "Error", "There was an error while reading the file.");
   }
+
   if (fileName != ""){
 
     if(DataIndex == 0){
@@ -118,73 +120,124 @@ void MainWindow::addDataTab(QString fileName){
   }
 }
 
-
 bool MainWindow::readDataFromFile(DataHandler *datahandler, QString fileName){
 
-  if (fileName != ""){
-    QFile file(fileName);
+  QString tabname,dataType;
+  tabname = fileName.split("/").last();
+  dataType = tabname.split(".").last();
+  if(dataType == "csv"){
+       if (fileName != ""){
+         QFile file(fileName);
 
-    if(!file.open(QIODevice::ReadOnly)) {
-        QMessageBox::information(0, "error", file.errorString());
-    }
+         if(!file.open(QIODevice::ReadOnly)) {
+             QMessageBox::information(0, "error", file.errorString());
+         }
 
-    QTextStream in(&file);
-
-    /* --- Skip first line ---*/
-
-    QString firstLine = in.readLine();
-    firstLine = firstLine.split("=")[1];
-
-
-    /* --- Read datafile header ---*/
-
-    QString header = in.readLine();
-    QStringList HeaderLine = header.split(",");
-
-    for (int i = 0; i < HeaderLine.size(); i++){
-      HeaderLine[i] = HeaderLine[i].remove("\"");
-    }
+         QTextStream in(&file);
 
 
-    /* --- Remove the VARIABLES= at beginning of line ---*/
+         /* --- Read datafile header ---*/
 
-    HeaderLine[0] = HeaderLine[0].split("=")[1];
+         QString header = in.readLine();
+         QStringList HeaderLine = header.split(",");
 
-    /* --- Skip third line ---*/
+         /* --- Read the data lines until end of file --- */
 
-    in.readLine();
+         QVector<QStringList> DataLines;
 
-    /* --- Read the data lines until end of file --- */
-
-    QVector<QStringList> DataLines;
-
-    while(!in.atEnd()) {
-        QString line = in.readLine();
-        line.remove("\"");
-        QStringList fields = line.split(",");
-        DataLines.push_back(fields);
-    }
+         while(!in.atEnd()) {
+             QString line = in.readLine();
+             QStringList fields = line.split(",");
+             DataLines.push_back(fields);
+         }
 
 
-    for (int iData = 0; iData < HeaderLine.size(); iData++){
+         for (int iData = 0; iData < HeaderLine.size(); iData++){
 
-        QVector <double> data;
-        DataHandler::DataItem item;
+             QVector <double> data;
+             DataHandler::DataItem item;
 
-        item.label = HeaderLine[iData];
+             item.label = HeaderLine[iData];
 
-        for (int iLine = 0; iLine < DataLines.size(); iLine++){
-            data.push_back(DataLines[iLine][iData].toDouble());
+             for (int iLine = 0; iLine < DataLines.size(); iLine++){
+                 data.push_back(DataLines[iLine][iData].toDouble());
+             }
+
+             item.data = data;
+
+             datahandler->addData(item);
+         }
+
+         return true;
+       }
+       return true;
+   }
+  else{
+      if (fileName != ""){
+        QFile file(fileName);
+
+        if(!file.open(QIODevice::ReadOnly)) {
+            QMessageBox::information(0, "error", file.errorString());
         }
 
-        item.data = data;
+        QTextStream in(&file);
 
-        datahandler->addData(item);
-    }
+        /* --- Skip first line ---*/
 
-    return true;
+        QString firstLine = in.readLine();
+        firstLine = firstLine.split("=")[1];
+
+
+        /* --- Read datafile header ---*/
+
+        QString header = in.readLine();
+        QStringList HeaderLine = header.split(",");
+
+        for (int i = 0; i < HeaderLine.size(); i++){
+          HeaderLine[i] = HeaderLine[i].remove("\"");
+        }
+
+
+        /* --- Remove the VARIABLES= at beginning of line ---*/
+
+        HeaderLine[0] = HeaderLine[0].split("=")[1];
+
+        /* --- Skip third line ---*/
+
+        in.readLine();
+
+        /* --- Read the data lines until end of file --- */
+
+        QVector<QStringList> DataLines;
+
+        while(!in.atEnd()) {
+            QString line = in.readLine();
+            line.remove("\"");
+            QStringList fields = line.split(",");
+            DataLines.push_back(fields);
+        }
+
+
+        for (int iData = 0; iData < HeaderLine.size(); iData++){
+
+            QVector <double> data;
+            DataHandler::DataItem item;
+
+            item.label = HeaderLine[iData];
+
+            for (int iLine = 0; iLine < DataLines.size(); iLine++){
+                data.push_back(DataLines[iLine][iData].toDouble());
+            }
+
+            item.data = data;
+
+            datahandler->addData(item);
+        }
+
+        return true;
+      }
+      return true;
   }
-  return true;
 }
 
 void MainWindow::refreshData(){
