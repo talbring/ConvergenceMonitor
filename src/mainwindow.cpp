@@ -110,7 +110,7 @@ void MainWindow::addDataTab(QString fileName){
     }
     DataIndex++;
 
-    DataTab* tab = new DataTab(data,ui->customplot, fileName,ui->tabWidget);
+    DataTab* tab = new DataTab(data,ui->customplot, fileName, NULL);
 
     datatabs.push_back(tab);
 
@@ -157,6 +157,10 @@ bool MainWindow::readDataFromFile(DataHandler *datahandler, QString fileName){
              QVector <double> data;
              DataHandler::DataItem item;
 
+             HeaderLine[iData] = HeaderLine[iData].trimmed();
+             HeaderLine[iData].chop(1);
+             HeaderLine[iData].remove(0,1);
+             
              item.label = HeaderLine[iData];
 
              for (int iLine = 0; iLine < DataLines.size(); iLine++){
@@ -267,8 +271,10 @@ void MainWindow::FitToData(bool triggered){
 void MainWindow::closeTab(int index){
   if (DataIndex != 0){
     DataIndex--;
-    ui->tabWidget->currentWidget()->deleteLater();
+//    ui->tabWidget->currentWidget()->deleteLater();
     ui->tabWidget->removeTab(index);
+    delete datatabs[index];
+    datatabs.remove(index);
     qDebug() << "Removing tab " << index;
     if (DataIndex == 0){
       ui->tabWidget->addTab(new QLabel("No data, load a history file"), QString("Data"));

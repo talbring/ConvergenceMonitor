@@ -23,6 +23,7 @@ protected slots:
   void changeAxes(QString axes);
   void changeLabel(int row, int column);
   void changeColor(int row);
+  void changeXArray(int index);
 
 private:
   Ui::DataTab *ui;

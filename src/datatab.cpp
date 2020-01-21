@@ -12,7 +12,7 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
   ui->setupUi(this);
 
   ui->tableWidget->setColumnCount(4);
-  ui->tableWidget->setRowCount(data->GetnData()-1);
+  ui->tableWidget->setRowCount(data->GetnData());
   ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Variable" << "Show" << "Axis" << "Color");
   ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   connect(ui->tableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(changeLabel(int,int)));
@@ -22,18 +22,23 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
         << "darkGreen" << "darkBlue" << "darkMagenta"
         << "darkCyan" << "darkYellow";
 
-  for (int i = 1; i < data->GetnData(); i++){
+  for (int i = 0; i < data->GetnData(); i++){
+    
+      ui->xArrayCombo->addItem(data->getData(i).label);
+      connect(ui->xArrayCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeXArray(int)));
+    
       data->getData(i).graph = plot->addGraph();
+      data->getData(i).graphIndex = plot->graphCount()-1;
 
       DataHandler::DataItem& item = data->getData(i);
 
-      ui->tableWidget->setItem(i-1,0, new QTableWidgetItem(item.label));
+      ui->tableWidget->setItem(i, 0, new QTableWidgetItem(item.label));
 
       QCheckBox* checkItem = new QCheckBox(ui->tableWidget);
       checkItem->setProperty("row", i);
       connect(checkItem, SIGNAL(stateChanged(int)), this, SLOT(showGraph(int)));
       checkItem->setCheckState(Qt::Unchecked);
-      ui->tableWidget->setCellWidget(i-1, 1, checkItem);
+      ui->tableWidget->setCellWidget(i, 1, checkItem);
 
 
       QComboBox* comboItem = new QComboBox(ui->tableWidget);
@@ -41,8 +46,7 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
       comboItem->addItem("Right");
       comboItem->setProperty("row", i);
       connect(comboItem, SIGNAL(currentTextChanged(QString)), this, SLOT(changeAxes(QString)));
-      ui->tableWidget->setCellWidget(i-1,2, comboItem);
-      
+      ui->tableWidget->setCellWidget(i,2, comboItem);
       
       
 
@@ -58,9 +62,9 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
       QSignalMapper *ButtonSignalMapper = new QSignalMapper();
       
       connect(ColorButton, SIGNAL(pressed()), ButtonSignalMapper, SLOT(map()));
-      ButtonSignalMapper->setMapping(ColorButton, i-1);
+      ButtonSignalMapper->setMapping(ColorButton, i);
       connect(ButtonSignalMapper, SIGNAL(mapped(int)), this, SLOT(changeColor(int)));
-      ui->tableWidget->setCellWidget(i-1, 3, ColorButton);
+      ui->tableWidget->setCellWidget(i, 3, ColorButton);
       
       QPalette pal = ColorButton->palette();
       pal.setColor(QPalette::Button, colors[(i)%9]);
@@ -72,6 +76,20 @@ DataTab::DataTab(DataHandler *data_, QCustomPlot *plot_, QString fileName_, QWid
   updateData(data);
 }
 
+void DataTab::changeXArray(int index){
+
+  DataHandler::DataItem& xArrayData = data->getData(index);
+  for (int i = 0; i < data->GetnData(); i++){
+    DataHandler::DataItem& item = data->getData(i);
+    
+    item.graph->clearData();
+    
+    item.graph->addData(xArrayData.data, item.data);
+  }
+  plot->rescaleAxes(true);
+  plot->replot();
+  
+}
 
 void DataTab::changeColor(int row){
   
@@ -99,14 +117,14 @@ void DataTab::updateData(DataHandler *new_data){
 
   data->updateValues(new_data);
 
-  DataHandler::DataItem& iterationNumber = data->getData(0);
+  DataHandler::DataItem& xArrayData = data->getData(ui->xArrayCombo->currentIndex());
 
-  for (int i = 1; i < data->GetnData(); i++){
+  for (int i = 0; i < data->GetnData(); i++){
     DataHandler::DataItem& item = data->getData(i);
 
     item.graph->clearData();
 
-    item.graph->addData(iterationNumber.data, item.data);
+    item.graph->addData(xArrayData.data, item.data);
   }
   plot->rescaleAxes(true);
   plot->replot();
@@ -115,8 +133,8 @@ void DataTab::updateData(DataHandler *new_data){
 void DataTab::changeLabel(int row, int column){
   QString text = ui->tableWidget->item(row, column)->text();
 
-  data->getData(row+1).label = text;
-  data->getData(row+1).graph->setName(text);
+  data->getData(row).label = text;
+  data->getData(row).graph->setName(text);
 
   plot->replot();
 }
@@ -169,9 +187,11 @@ void DataTab::changeAxes(QString axes){
 DataTab::~DataTab()
 {
 
-  for (int i = 1; i < data->GetnData(); i++){
-      DataHandler::DataItem& item = data->getData(i);
-     plot->removeGraph(item.graph);
+  for (int i = 0; i < data->GetnData(); i++){
+    DataHandler::DataItem& item = data->getData(i);
+    
+    //item.graph->removeFromLegend();
+    plot->removeGraph(item.graphIndex);
   }
 
 //  plot->replot();
