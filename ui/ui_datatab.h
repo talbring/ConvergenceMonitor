@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'datatab.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.1
+** Created by: Qt User Interface Compiler version 5.13.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,9 +11,13 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QTableWidget>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -22,6 +26,10 @@ class Ui_DataTab
 {
 public:
     QGridLayout *gridLayout;
+    QVBoxLayout *verticalLayout;
+    QHBoxLayout *horizontalLayout;
+    QLabel *label;
+    QComboBox *xArrayCombo;
     QTableWidget *tableWidget;
 
     void setupUi(QWidget *DataTab)
@@ -31,6 +39,23 @@ public:
         DataTab->resize(240, 277);
         gridLayout = new QGridLayout(DataTab);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        verticalLayout = new QVBoxLayout();
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        label = new QLabel(DataTab);
+        label->setObjectName(QString::fromUtf8("label"));
+
+        horizontalLayout->addWidget(label);
+
+        xArrayCombo = new QComboBox(DataTab);
+        xArrayCombo->setObjectName(QString::fromUtf8("xArrayCombo"));
+
+        horizontalLayout->addWidget(xArrayCombo);
+
+
+        verticalLayout->addLayout(horizontalLayout);
+
         tableWidget = new QTableWidget(DataTab);
         if (tableWidget->columnCount() < 2)
             tableWidget->setColumnCount(2);
@@ -40,7 +65,10 @@ public:
         tableWidget->setRowCount(1);
         tableWidget->setColumnCount(2);
 
-        gridLayout->addWidget(tableWidget, 0, 0, 1, 1);
+        verticalLayout->addWidget(tableWidget);
+
+
+        gridLayout->addLayout(verticalLayout, 0, 0, 1, 1);
 
 
         retranslateUi(DataTab);
@@ -50,7 +78,8 @@ public:
 
     void retranslateUi(QWidget *DataTab)
     {
-        DataTab->setWindowTitle(QApplication::translate("DataTab", "Form", nullptr));
+        DataTab->setWindowTitle(QCoreApplication::translate("DataTab", "Form", nullptr));
+        label->setText(QCoreApplication::translate("DataTab", "X Array", nullptr));
     } // retranslateUi
 
 };

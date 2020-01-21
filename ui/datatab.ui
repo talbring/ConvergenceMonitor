@@ -15,17 +15,35 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QTableWidget" name="tableWidget">
-     <property name="rowCount">
-      <number>1</number>
-     </property>
-     <property name="columnCount">
-      <number>2</number>
-     </property>
-     <row/>
-     <column/>
-     <column/>
-    </widget>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>X Array</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="xArrayCombo"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTableWidget" name="tableWidget">
+       <property name="rowCount">
+        <number>1</number>
+       </property>
+       <property name="columnCount">
+        <number>2</number>
+       </property>
+       <row/>
+       <column/>
+       <column/>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

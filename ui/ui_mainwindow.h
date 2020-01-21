@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.1
+** Created by: Qt User Interface Compiler version 5.13.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -45,18 +45,18 @@ public:
     QDockWidget *dockWidget;
     QWidget *dockWidgetContents;
     QGridLayout *gridLayout_3;
-    QTabWidget *tabWidget;
     QHBoxLayout *horizontalLayout;
     QPushButton *buttonRefresh;
     QCheckBox *checkRefresh;
     QSpinBox *spinRefresh;
     QLabel *label;
+    QTabWidget *tabWidget;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
-        MainWindow->resize(899, 474);
+        MainWindow->resize(905, 483);
         actionLoad_History = new QAction(MainWindow);
         actionLoad_History->setObjectName(QString::fromUtf8("actionLoad_History"));
         actionFit_to_Data = new QAction(MainWindow);
@@ -83,7 +83,7 @@ public:
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 899, 19));
+        menuBar->setGeometry(QRect(0, 0, 905, 21));
         menuFile = new QMenu(menuBar);
         menuFile->setObjectName(QString::fromUtf8("menuFile"));
         menuView = new QMenu(menuBar);
@@ -100,17 +100,6 @@ public:
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
         gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
-        tabWidget = new QTabWidget(dockWidgetContents);
-        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
-        tabWidget->setMinimumSize(QSize(261, 370));
-        tabWidget->setTabShape(QTabWidget::Rounded);
-        tabWidget->setElideMode(Qt::ElideNone);
-        tabWidget->setUsesScrollButtons(true);
-        tabWidget->setDocumentMode(false);
-        tabWidget->setTabsClosable(true);
-
-        gridLayout_3->addWidget(tabWidget, 0, 0, 1, 1);
-
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(6);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -140,8 +129,19 @@ public:
 
         gridLayout_3->addLayout(horizontalLayout, 1, 0, 1, 1);
 
+        tabWidget = new QTabWidget(dockWidgetContents);
+        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
+        tabWidget->setMinimumSize(QSize(261, 370));
+        tabWidget->setTabShape(QTabWidget::Rounded);
+        tabWidget->setElideMode(Qt::ElideNone);
+        tabWidget->setUsesScrollButtons(true);
+        tabWidget->setDocumentMode(false);
+        tabWidget->setTabsClosable(true);
+
+        gridLayout_3->addWidget(tabWidget, 0, 0, 1, 1);
+
         dockWidget->setWidget(dockWidgetContents);
-        MainWindow->addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
+        MainWindow->addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
         menuBar->addAction(menuFile->menuAction());
         menuBar->addAction(menuView->menuAction());
@@ -158,15 +158,15 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "Convergence Monitor", nullptr));
-        actionLoad_History->setText(QApplication::translate("MainWindow", "&Load History ...", nullptr));
-        actionFit_to_Data->setText(QApplication::translate("MainWindow", "&Fit to Data", nullptr));
-        menuFile->setTitle(QApplication::translate("MainWindow", "Fi&le", nullptr));
-        menuView->setTitle(QApplication::translate("MainWindow", "Plot", nullptr));
-        dockWidget->setWindowTitle(QApplication::translate("MainWindow", "&Loaded Data", nullptr));
-        buttonRefresh->setText(QApplication::translate("MainWindow", "Refresh", nullptr));
-        checkRefresh->setText(QApplication::translate("MainWindow", "Auto update every:", nullptr));
-        label->setText(QApplication::translate("MainWindow", "ms", nullptr));
+        MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "Convergence Monitor", nullptr));
+        actionLoad_History->setText(QCoreApplication::translate("MainWindow", "&Load History ...", nullptr));
+        actionFit_to_Data->setText(QCoreApplication::translate("MainWindow", "&Fit to Data", nullptr));
+        menuFile->setTitle(QCoreApplication::translate("MainWindow", "Fi&le", nullptr));
+        menuView->setTitle(QCoreApplication::translate("MainWindow", "Plot", nullptr));
+        dockWidget->setWindowTitle(QCoreApplication::translate("MainWindow", "History Data", nullptr));
+        buttonRefresh->setText(QCoreApplication::translate("MainWindow", "Refresh", nullptr));
+        checkRefresh->setText(QCoreApplication::translate("MainWindow", "Auto update every:", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "ms", nullptr));
     } // retranslateUi
 
 };

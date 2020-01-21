@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'plotsettings.ui'
 **
-** Created by: Qt User Interface Compiler version 5.12.1
+** Created by: Qt User Interface Compiler version 5.13.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -41,7 +41,7 @@ public:
 
     void retranslateUi(QDialog *plotsettings)
     {
-        plotsettings->setWindowTitle(QApplication::translate("plotsettings", "Dialog", nullptr));
+        plotsettings->setWindowTitle(QCoreApplication::translate("plotsettings", "Dialog", nullptr));
     } // retranslateUi
 
 };
